@@ -17,10 +17,10 @@ export class AuthService {
     return !!localStorage.getItem('userToken');
   }
 
-  login(username: string, password: string) {
+  login(email: string, password: string) {
     return this.instance
       .post<LoginResponse>('/api/auth/login', {
-        email: username,
+        email,
         password,
       })
       .pipe(

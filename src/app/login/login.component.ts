@@ -9,14 +9,14 @@ import { AppRoutes } from '../models/AppRoutes';
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
-  username: string = '';
+  email: string = '';
   password: string = '';
   errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   login() {
-    this.authService.login(this.username, this.password).subscribe({
+    this.authService.login(this.email, this.password).subscribe({
       next: () => {
         this.router.navigate([AppRoutes.Dashboard]);
       },
