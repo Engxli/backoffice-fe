@@ -1,0 +1,33 @@
+<div class="container mx-auto px-4">
+  <h2 class="text-xl font-bold my-4">Customers List</h2>
+
+  <table class="table-auto w-full mt-4">
+    <thead>
+      <tr>
+        <th class="px-4 py-2">Customer Number</th>
+        <th class="px-4 py-2">Name</th>
+        <th class="px-4 py-2">Age</th>
+        <th class="px-4 py-2">DOB</th>
+        <th class="px-4 py-2">Gender</th>
+        <th class="px-4 py-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers">
+        <td class="border px-4 py-2">{{ customer.id }}</td>
+        <td class="border px-4 py-2">{{ customer.name }}</td>
+        <td class="border px-4 py-2">{{ customer.age }}</td>
+        <td class="border px-4 py-2">{{ customer.dateOfBirth | date }}</td>
+        <td class="border px-4 py-2">{{ customer.gender }}</td>
+        <td class="border px-4 py-2">
+          <button
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
+            (click)="updateCustomer(customer.id)"
+          >
+            Update
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
