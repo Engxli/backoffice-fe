@@ -9,6 +9,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ApiInterceptor } from './services/api.interceptor';
 import { CustomersComponent } from './main/customers/customers.component';
 import { ModalComponent } from './main/modal/modal.component';
+import { CeilPipe } from './utils/pipes/ceil.pipe';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { ModalComponent } from './main/modal/modal.component';
     MainComponent,
     CustomersComponent,
     ModalComponent,
+    CeilPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [

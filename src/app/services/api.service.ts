@@ -5,12 +5,12 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseURL = 'https://backoffice-api.turguta.com';
+  private baseURL = 'http://localhost:8000';
 
   constructor(private http: HttpClient) {}
 
-  get<T>(url: string) {
-    return this.http.get<T>(this.baseURL + url);
+  get<T>(url: string, params?: any) {
+    return this.http.get<T>(this.baseURL + url, { params });
   }
 
   post<T>(url: string, body: any) {

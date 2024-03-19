@@ -10,8 +10,20 @@ import { ApiService } from './api.service';
 export class CustomerService {
   constructor(private instance: ApiService) {}
 
-  getCustomers() {
-    return this.instance.get<any[]>(`/api/customers`);
+  getCustomers<T>(
+    page: number,
+    pageSize: number,
+    sortBy: string,
+    sortOrder: string
+  ) {
+    const params = {
+      page,
+      pageSize,
+      sortBy,
+      sortOrder,
+    };
+
+    return this.instance.get<T>(`/api/customers`, params);
   }
 
   getCustomerById(id: number) {

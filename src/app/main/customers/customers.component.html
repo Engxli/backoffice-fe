@@ -1,33 +1,85 @@
-<div class="container mx-auto px-4">
-  <h2 class="text-xl font-bold my-4">Customers List</h2>
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold mb-4">Customers List</h2>
 
-  <table class="table-auto w-full mt-4">
-    <thead>
-      <tr>
-        <th class="px-4 py-2">Customer Number</th>
-        <th class="px-4 py-2">Name</th>
-        <th class="px-4 py-2">Age</th>
-        <th class="px-4 py-2">DOB</th>
-        <th class="px-4 py-2">Gender</th>
-        <th class="px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let customer of customers">
-        <td class="border px-4 py-2">{{ customer.id }}</td>
-        <td class="border px-4 py-2">{{ customer.name }}</td>
-        <td class="border px-4 py-2">{{ customer.age }}</td>
-        <td class="border px-4 py-2">{{ customer.dateOfBirth | date }}</td>
-        <td class="border px-4 py-2">{{ customer.gender }}</td>
-        <td class="border px-4 py-2">
-          <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
-            (click)="updateCustomer(customer.id)"
-          >
-            Update
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div
+    class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+  >
+    <table
+      class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative"
+    >
+      <thead>
+        <tr class="text-left">
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('id')">
+            Customer Number
+          </th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('name')">Name</th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('age')">Age</th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('dateOfBirth')">
+            DOB
+          </th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('gender')">
+            Gender
+          </th>
+          <th class="py-2 px-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of dataSource.data" class="hover:bg-gray-100">
+          <td class="py-2 px-3">{{ customer.id }}</td>
+          <td class="py-2 px-3">{{ customer.name }}</td>
+          <td class="py-2 px-3">{{ customer.age }}</td>
+          <td class="py-2 px-3">{{ customer.dateOfBirth | date }}</td>
+          <td class="py-2 px-3">{{ customer.gender }}</td>
+          <td class="py-2 px-3">
+            <button
+              class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+              (click)="updateCustomer(customer.id)"
+            >
+              Update
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex justify-center items-center pt-5 w-full">
+    <div class="w-[30%] h-[75px] justify-center items-center flex">
+      <div class="w-[90%]">
+        <label for="itemsPerPage" class="text-center">Items per page</label>
+        <select
+          id="itemsPerPage"
+          class="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+          (change)="setItemsPerPage($event)"
+        >
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
+      </div>
+    </div>
+    <div class="w-[30%] h-[75px] justify-center items-center flex">
+      <div>
+        Page {{ currentPage }} of
+        {{ dataSource.totalItems / itemsPerPage | ceil }}
+      </div>
+    </div>
+    <div class="w-[40%] h-[75px] justify-end items-center flex gap-2">
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        (click)="setPage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+      >
+        Previous
+      </button>
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        (click)="setPage(currentPage + 1)"
+        [disabled]="currentPage * itemsPerPage >= dataSource.totalItems"
+      >
+        Next
+      </button>
+    </div>
+  </div>
 </div>
