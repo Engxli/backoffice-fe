@@ -1,0 +1,31 @@
+<!-- Sort Up Icon -->
+<ng-container *ngIf="sortBy">
+  <svg
+    *ngIf="sortOrder === 'ASC'"
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-6 w-6 text-blue-500"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="6 15 12 9 18 15"></polyline>
+  </svg>
+
+  <!-- Sort Down Icon -->
+  <svg
+    *ngIf="sortOrder === 'DESC'"
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-6 w-6 text-red-500"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+</ng-container>

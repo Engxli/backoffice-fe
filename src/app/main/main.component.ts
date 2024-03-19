@@ -1,7 +1,8 @@
 // src/app/main/main.component.ts
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../services/customer.service';
+import { CustomersComponent } from './customers/customers.component';
 
 @Component({
   selector: 'app-main',
@@ -9,18 +10,18 @@ import { CustomerService } from '../services/customer.service';
 })
 export class MainComponent implements OnInit {
   customers: any[] = [];
+  showModal: boolean = false;
+  @ViewChild('customerComponent') customerComponent!: CustomersComponent;
 
-  constructor(private router: Router) {}
-
-  ngOnInit() {}
-
-  addCustomer() {
-    // Navigate to the add customer component/page
-    this.router.navigate(['/add-customer']);
+  onCustomerAdded(): void {
+    this.customerComponent.loadCustomers();
   }
 
-  updateCustomer(customerId: number) {
-    // Navigate to the update customer component/page with customerId
-    this.router.navigate(['/update-customer', customerId]);
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.activatedRoute.queryParamMap.subscribe((params) => {
+      this.showModal = params.get('new') === 'true' || !!params.get('update');
+    });
   }
 }

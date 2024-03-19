@@ -10,6 +10,10 @@ import { ApiInterceptor } from './services/api.interceptor';
 import { CustomersComponent } from './main/customers/customers.component';
 import { ModalComponent } from './main/modal/modal.component';
 import { CeilPipe } from './utils/pipes/ceil.pipe';
+import { FormatDatePipe } from './utils/pipes/format-date.pipe';
+import { NavbarComponent } from './main/navbar/navbar.component';
+import { FooterComponent } from './main/footer/footer.component';
+import { SortIconComponent } from './main/sort-icon/sort-icon.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +23,10 @@ import { CeilPipe } from './utils/pipes/ceil.pipe';
     CustomersComponent,
     ModalComponent,
     CeilPipe,
+    FormatDatePipe,
+    NavbarComponent,
+    FooterComponent,
+    SortIconComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [

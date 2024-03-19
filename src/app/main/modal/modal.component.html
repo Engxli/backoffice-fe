@@ -1,11 +1,108 @@
-<div class="fixed inset-0 bg-[#00000090] justify-center items-center flex">
-  <div class="w-[500px] h-[300px] bg-white rounded-xl">
-    <div class="flex justify-between items-center p-4 border-b">
-      <h2 class="text-xl font-bold">Modal</h2>
-      <button class="text-xl font-bold">&times;</button>
-    </div>
-    <div class="p-4">
-      <p>Modal Content</p>
+<div
+  class="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center px-4 py-8"
+>
+  <div
+    class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all md:w-[500px] w-[90%] h-[400px]"
+  >
+    <button
+      type="button"
+      class="absolute top-0 right-0 pt-4 pr-4"
+      (click)="closeModal()"
+    >
+      <svg
+        class="h-6 w-6 text-gray-900"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+    <div class="px-4 py-5 sm:p-6">
+      <div class="text-center">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          {{ modalTitle }}
+        </h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500" *ngIf="!isUpdateMode">
+            Fill in the details below to create a new customer.
+          </p>
+          <p class="text-sm text-gray-500" *ngIf="isUpdateMode">
+            Update the details below.
+          </p>
+        </div>
+      </div>
+
+      <form class="mt-8 space-y-6" (ngSubmit)="createOrUpdateCustomer()">
+        <div class="rounded-md shadow-sm -space-y-px">
+          <div>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="name"
+              required
+              placeholder="Enter customer name"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            />
+          </div>
+          <div>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              [(ngModel)]="age"
+              required
+              placeholder="Enter customer age"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            />
+          </div>
+          <div>
+            <input
+              type="date"
+              id="dateOfBirth"
+              name="dateOfBirth"
+              [(ngModel)]="dateOfBirth"
+              required
+              placeholder="Enter customer date of birth"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            />
+          </div>
+          <div>
+            <select
+              id="gender"
+              name="gender"
+              [(ngModel)]="gender"
+              required
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 bg-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="" disabled selected>Select customer gender</option>
+              <option *ngFor="let g of genders" [value]="g" class="capitalize">
+                {{ g }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="text-center text-sm text-red-600 h-[25px]">
+          <p *ngIf="errorMessage">
+            {{ errorMessage }}
+          </p>
+        </div>
+        <div class="text-right">
+          <button
+            type="submit"
+            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            {{ submitButtonLabel }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

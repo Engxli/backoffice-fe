@@ -1,5 +1,16 @@
-<div class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold mb-4">Customers List</h2>
+<div class="container mx-auto px-4 py-8 h-full">
+  <div class="flex justify-between items-center h-[75px]">
+    <div class="text-2xl font-bold">Customers List</div>
+
+    <div class="flex justify-end items-center gap-4 h-full">
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        (click)="addCustomer()"
+      >
+        Add Customer
+      </button>
+    </div>
+  </div>
 
   <div
     class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
@@ -10,15 +21,52 @@
       <thead>
         <tr class="text-left">
           <th class="py-2 px-3 cursor-pointer" (click)="sort('id')">
-            Customer Number
+            <div class="flex justify-start items-center gap-2">
+              Customer Number
+              <app-sort-icon
+                [sortBy]="sortBy === 'id'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
           </th>
-          <th class="py-2 px-3 cursor-pointer" (click)="sort('name')">Name</th>
-          <th class="py-2 px-3 cursor-pointer" (click)="sort('age')">Age</th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('name')">
+            <div class="flex justify-start items-center gap-2">
+              Name
+
+              <app-sort-icon
+                [sortBy]="sortBy === 'name'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
+          </th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('age')">
+            <div class="flex justify-start items-center gap-2">
+              Age
+
+              <app-sort-icon
+                [sortBy]="sortBy === 'age'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
+          </th>
           <th class="py-2 px-3 cursor-pointer" (click)="sort('dateOfBirth')">
-            DOB
+            <div class="flex justify-start items-center gap-2">
+              DOB
+
+              <app-sort-icon
+                [sortBy]="sortBy === 'dateOfBirth'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
           </th>
           <th class="py-2 px-3 cursor-pointer" (click)="sort('gender')">
-            Gender
+            <div class="flex justify-start items-center gap-2">
+              Gender
+              <app-sort-icon
+                [sortBy]="sortBy === 'gender'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
           </th>
           <th class="py-2 px-3">Actions</th>
         </tr>
@@ -52,10 +100,18 @@
           class="bg-gray-50 border w-full border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
           (change)="setItemsPerPage($event)"
         >
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
+          <!-- for loop in itemPerPageOptions and show them here -->
+          <option
+            *ngFor="let option of itemsPerPageOptions"
+            [value]="option"
+            [selected]="itemsPerPage == option"
+          >
+            {{ option }}
+          </option>
+          <!-- <option value="5" [selected]="itemsPerPage == 5">5</option>
+          <option value="10" [selected]="itemsPerPage == 10">10</option>
+          <option value="25" [selected]="itemsPerPage == 25">25</option>
+          <option value="50" [selected]="itemsPerPage == 50">50</option> -->
         </select>
       </div>
     </div>
