@@ -14,13 +14,17 @@ export class CustomerService {
     page: number,
     pageSize: number,
     sortBy: string,
-    sortOrder: string
+    sortOrder: string,
+    name?: string,
+    number?: string
   ) {
     const params = {
       page,
       pageSize,
       sortBy,
       sortOrder,
+      name: name ?? '',
+      number: number ?? '',
     };
 
     return this.instance.get<T>(`/api/customers`, params);

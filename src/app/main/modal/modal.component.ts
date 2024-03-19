@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppRoutes } from '../../models/AppRoutes';
 import { CustomerService } from '../../services/customer.service';
-import { FormatDatePipe } from '../../utils/pipes/format-date.pipe';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-modal',
@@ -10,16 +10,18 @@ import { FormatDatePipe } from '../../utils/pipes/format-date.pipe';
 })
 export class ModalComponent implements OnInit {
   name: string = '';
+  number: string = '';
   _age: number = 0;
   _dateOfBirth: Date = new Date();
   gender: string = '';
-  genders = ['male', 'female']; // Added for gender options
+  genders = ['male', 'female'];
   errorMessage: string = '';
-  modalTitle: string = 'Add New Customer';
-  submitButtonLabel: string = 'Create Customer';
+  modalTitle: string = '';
+  submitButtonLabel: string = '';
   isUpdateMode: boolean = false;
+  isDeleteMode: boolean = false;
   customerIdToUpdate: string | null = null;
-  formatDatePipe = new FormatDatePipe();
+  today: Date = new Date();
 
   @Output() customerAdded = new EventEmitter<void>();
 
@@ -31,78 +33,109 @@ export class ModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
-      if (params['new'] === 'true') {
-        this.prepareForNewCustomer();
-      } else if (params['update']) {
-        this.customerIdToUpdate = params['update'];
-        this.prepareForUpdateCustomer(this.customerIdToUpdate!);
+      this.isDeleteMode = params['delete'] ? true : false;
+      this.isUpdateMode = params['update'] ? true : false;
+      this.modalTitle = this.isUpdateMode
+        ? 'Update Customer'
+        : this.isDeleteMode
+        ? 'Delete Customer'
+        : 'Add New Customer';
+      this.submitButtonLabel = this.isUpdateMode
+        ? 'Update Customer'
+        : this.isDeleteMode
+        ? 'Delete Customer'
+        : 'Create Customer';
+      if (this.isUpdateMode || this.isDeleteMode) {
+        const id = this.isUpdateMode ? 'update' : 'delete';
+        this.customerIdToUpdate = params[id];
+        this.prepareForUpdateCustomerOrDelete(params[id]);
       }
     });
   }
 
-  prepareForNewCustomer(): void {
-    this.modalTitle = 'Add New Customer';
-    this.submitButtonLabel = 'Create Customer';
-    this.isUpdateMode = false;
-  }
-
-  prepareForUpdateCustomer(id: string): void {
-    this.customerService.getCustomerById(Number(id)).subscribe((customer) => {
-      this.name = customer.name;
-      this.age = customer.age;
-      this.dateOfBirth = this.formatDatePipe.transform(customer.dateOfBirth);
-      this.gender = customer.gender;
-      this.modalTitle = 'Update Customer';
-      this.submitButtonLabel = 'Update Customer';
-      this.isUpdateMode = true;
+  prepareForUpdateCustomerOrDelete(id: string): void {
+    this.customerService.getCustomerById(Number(id)).subscribe({
+      next: (customer) => this.populateForm(customer),
+      error: (error) => this.handleError(error),
     });
   }
 
-  closeModal(): void {
-    this.router.navigate([AppRoutes.Dashboard], {
-      queryParams: { new: 'false', update: null },
-      queryParamsHandling: 'merge',
-    });
+  populateForm(customer: any): void {
+    this.name = customer.name;
+    this._age = customer.age;
+    this.number = customer.number;
+    this._dateOfBirth = new Date(customer.dateOfBirth);
+    this.dateOfBirth = formatDate(this._dateOfBirth, 'yyyy-MM-dd', 'en-US');
+    this.gender = customer.gender;
+  }
+
+  handleError(error: any): void {
+    this.errorMessage =
+      error.error.message || error.error || 'An error occurred';
+    console.error('Error:', error);
   }
 
   createOrUpdateCustomer(): void {
-    if (!this.name || !this.age || !this.dateOfBirth || !this.gender) {
-      this.errorMessage = 'All fields are required';
+    if (!this.validateForm()) return;
+    if (this.isDeleteMode) {
+      this.deleteCustomer();
       return;
     }
-
     const customerData = {
       name: this.name,
       age: this._age,
-      dateOfBirth: this.formatDatePipe.transform(this._dateOfBirth),
+      number: this.number,
+      dateOfBirth: formatDate(this._dateOfBirth, 'yyyy-MM-dd', 'en-US'),
       gender: this.gender,
     };
 
-    if (this.isUpdateMode && this.customerIdToUpdate) {
-      this.customerService
-        .updateCustomer(Number(this.customerIdToUpdate), customerData)
-        .subscribe({
-          next: () => {
-            this.customerAdded.emit();
-            this.closeModal();
-          },
-          error: (error) => {
-            this.errorMessage = error.error.message || error.error;
-            console.error('There was an error updating the customer:', error);
-          },
-        });
-    } else {
-      this.customerService.addCustomer(customerData).subscribe({
-        next: () => {
-          this.customerAdded.emit();
-          this.closeModal();
-        },
-        error: (error) => {
-          this.errorMessage = error.error.message || error.error;
-          console.error('There was an error adding the customer:', error);
-        },
-      });
+    const operation = this.isUpdateMode
+      ? this.customerService.updateCustomer(
+          Number(this.customerIdToUpdate),
+          customerData
+        )
+      : this.customerService.addCustomer(customerData);
+
+    operation.subscribe({
+      next: () => this.finalizeOperation(),
+      error: (error) => this.handleError(error),
+    });
+  }
+
+  deleteCustomer(): void {
+    if (!this.customerIdToUpdate) {
+      this.errorMessage = 'Customer ID is required';
+      return;
     }
+    this.customerService
+      .deleteCustomer(Number(this.customerIdToUpdate))
+      .subscribe({
+        next: () => this.finalizeOperation(),
+        error: (error) => this.handleError(error),
+      });
+  }
+
+  validateForm(): boolean {
+    if (!this._age) {
+      this.errorMessage = 'Age is required and cannot be 0';
+      return false;
+    }
+    if (
+      !this.name ||
+      !this._age ||
+      !this._dateOfBirth ||
+      !this.gender ||
+      !this.number
+    ) {
+      this.errorMessage = 'All fields are required';
+      return false;
+    }
+    return true;
+  }
+
+  finalizeOperation(): void {
+    this.customerAdded.emit();
+    this.closeModal();
   }
 
   get age(): string {
@@ -110,14 +143,38 @@ export class ModalComponent implements OnInit {
   }
 
   set age(value: string) {
-    this._age = value ? parseInt(value, 10) : 0;
-  }
-
-  get dateOfBirth(): string {
-    return this.formatDatePipe.transform(this._dateOfBirth);
+    const ageInt = parseInt(value, 10) || 0;
+    this.syncAgeAndDOB(ageInt);
   }
 
   set dateOfBirth(value: string) {
     this._dateOfBirth = new Date(value);
+    this.onDOBChange(value);
+  }
+
+  get dateOfBirth(): string {
+    return formatDate(this._dateOfBirth, 'yyyy-MM-dd', 'en-US');
+  }
+
+  syncAgeAndDOB(age: number): void {
+    this._age = age;
+    if (age > 0) {
+      const currentYear = new Date().getFullYear();
+      const birthYear = currentYear - age;
+      this._dateOfBirth.setFullYear(birthYear);
+    }
+  }
+
+  onDOBChange(dob: string): void {
+    this._dateOfBirth = new Date(dob);
+    const age = new Date().getFullYear() - this._dateOfBirth.getFullYear();
+    this._age = age >= 0 ? age : 0;
+  }
+
+  closeModal(): void {
+    this.router.navigate([AppRoutes.Dashboard], {
+      queryParams: { new: 'false', update: null, delete: null },
+      queryParamsHandling: 'merge',
+    });
   }
 }

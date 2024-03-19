@@ -2,7 +2,7 @@
   class="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center px-4 py-8"
 >
   <div
-    class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all md:w-[500px] w-[90%] h-[400px]"
+    class="relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all md:w-[500px] w-[90%] h-[450px]"
   >
     <button
       type="button"
@@ -30,15 +30,24 @@
           {{ modalTitle }}
         </h3>
         <div class="mt-2">
-          <p class="text-sm text-gray-500" *ngIf="!isUpdateMode">
+          <p
+            class="text-sm text-gray-500"
+            *ngIf="!isUpdateMode && !isDeleteMode"
+          >
             Fill in the details below to create a new customer.
           </p>
-          <p class="text-sm text-gray-500" *ngIf="isUpdateMode">
+          <p
+            class="text-sm text-gray-500"
+            *ngIf="isUpdateMode && !isDeleteMode"
+          >
             Update the details below.
+          </p>
+
+          <p class="text-sm text-gray-500" *ngIf="isDeleteMode">
+            Are you sure you want to delete this customer?
           </p>
         </div>
       </div>
-
       <form class="mt-8 space-y-6" (ngSubmit)="createOrUpdateCustomer()">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
@@ -48,7 +57,20 @@
               name="name"
               [(ngModel)]="name"
               required
+              [disabled]="isDeleteMode"
               placeholder="Enter customer name"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              id="number"
+              [disabled]="isDeleteMode"
+              name="number"
+              [(ngModel)]="number"
+              required
+              placeholder="Enter customer number"
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
             />
           </div>
@@ -56,6 +78,7 @@
             <input
               type="number"
               id="age"
+              [disabled]="isDeleteMode"
               name="age"
               [(ngModel)]="age"
               required
@@ -68,8 +91,11 @@
               type="date"
               id="dateOfBirth"
               name="dateOfBirth"
+              [disabled]="isDeleteMode"
               [(ngModel)]="dateOfBirth"
+              (ngModelChange)="onDOBChange($event)"
               required
+              [max]="today | date : 'yyyy-MM-dd'"
               placeholder="Enter customer date of birth"
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
             />
@@ -77,27 +103,34 @@
           <div>
             <select
               id="gender"
+              [disabled]="isDeleteMode"
               name="gender"
               [(ngModel)]="gender"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 bg-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
               <option value="" disabled selected>Select customer gender</option>
-              <option *ngFor="let g of genders" [value]="g" class="capitalize">
-                {{ g }}
-              </option>
+              <option *ngFor="let g of genders" [value]="g">{{ g }}</option>
             </select>
           </div>
         </div>
         <div class="text-center text-sm text-red-600 h-[25px]">
-          <p *ngIf="errorMessage">
-            {{ errorMessage }}
-          </p>
+          <p *ngIf="errorMessage">{{ errorMessage }}</p>
         </div>
-        <div class="text-right">
+        <div class="text-right flex gap-2 justify-end">
+          <button
+            (click)="closeModal()"
+            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          >
+            Cancel
+          </button>
           <button
             type="submit"
-            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2"
+            [ngClass]="{
+              'bg-blue-500 hover:bg-blue-600': !isDeleteMode,
+              'bg-red-500 hover:bg-red-600': isDeleteMode
+            }"
           >
             {{ submitButtonLabel }}
           </button>

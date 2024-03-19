@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-8 h-full">
+<div class="container mx-auto px-4 py-2 h-full">
   <div class="flex justify-between items-center h-[75px]">
     <div class="text-2xl font-bold">Customers List</div>
 
@@ -22,7 +22,7 @@
         <tr class="text-left">
           <th class="py-2 px-3 cursor-pointer" (click)="sort('id')">
             <div class="flex justify-start items-center gap-2">
-              Customer Number
+              ID
               <app-sort-icon
                 [sortBy]="sortBy === 'id'"
                 [sortOrder]="sortOrder"
@@ -45,6 +45,16 @@
 
               <app-sort-icon
                 [sortBy]="sortBy === 'age'"
+                [sortOrder]="sortOrder"
+              ></app-sort-icon>
+            </div>
+          </th>
+          <th class="py-2 px-3 cursor-pointer" (click)="sort('number')">
+            <div class="flex justify-start items-center gap-2">
+              Number
+
+              <app-sort-icon
+                [sortBy]="sortBy === 'number'"
                 [sortOrder]="sortOrder"
               ></app-sort-icon>
             </div>
@@ -76,15 +86,24 @@
           <td class="py-2 px-3">{{ customer.id }}</td>
           <td class="py-2 px-3">{{ customer.name }}</td>
           <td class="py-2 px-3">{{ customer.age }}</td>
+          <td class="py-2 px-3">{{ customer.number }}</td>
           <td class="py-2 px-3">{{ customer.dateOfBirth | date }}</td>
           <td class="py-2 px-3">{{ customer.gender }}</td>
           <td class="py-2 px-3">
-            <button
-              class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
-              (click)="updateCustomer(customer.id)"
-            >
-              Update
-            </button>
+            <div class="gap-2 flex">
+              <button
+                class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+                (click)="updateCustomer(customer.id)"
+              >
+                Update
+              </button>
+              <button
+                class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+                (click)="deleteCustomer(customer.id)"
+              >
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -123,16 +142,27 @@
     </div>
     <div class="w-[40%] h-[75px] justify-end items-center flex gap-2">
       <button
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        class="text-white px-4 py-2 rounded"
         (click)="setPage(currentPage - 1)"
         [disabled]="currentPage === 1"
+        [ngClass]="{
+          ' bg-gray-500': currentPage === 1,
+          'hover:bg-blue-600 bg-blue-500': currentPage !== 1
+        }"
       >
         Previous
       </button>
       <button
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        class="text-white px-4 py-2 rounded hover:bg-blue-600 bg-blue-500"
         (click)="setPage(currentPage + 1)"
         [disabled]="currentPage * itemsPerPage >= dataSource.totalItems"
+        [ngClass]="{
+          ' bg-gray-500': currentPage * itemsPerPage >= dataSource.totalItems,
+          'hover:bg-blue-600 bg-blue-500': !(
+            currentPage * itemsPerPage >=
+            dataSource.totalItems
+          )
+        }"
       >
         Next
       </button>

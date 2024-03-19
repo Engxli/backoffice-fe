@@ -17,11 +17,17 @@ export class MainComponent implements OnInit {
     this.customerComponent.loadCustomers();
   }
 
+  onSearch(search: string) {
+    this.customerComponent.loadCustomersWithSearch(search);
+  }
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
     this.activatedRoute.queryParamMap.subscribe((params) => {
-      this.showModal = params.get('new') === 'true' || !!params.get('update');
+      this.showModal =
+        params.get('new') === 'true' ||
+        !!params.get('update') ||
+        !!params.get('delete');
     });
   }
 }

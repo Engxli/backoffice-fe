@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseURL = 'https://backoffice-api.turguta.com';
+  private baseURL = 'http://192.168.50.217:8000';
 
   constructor(private http: HttpClient) {}
 

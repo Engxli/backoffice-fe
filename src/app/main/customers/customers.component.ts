@@ -15,6 +15,7 @@ export class CustomersComponent implements OnInit {
   sortBy: string = 'id'; // Default sorting column
   sortOrder: string = 'ASC'; // Default sorting order
   itemsPerPageOptions: number[] = [5, 10, 20, 50];
+  search: string = '';
   constructor(
     private customerService: CustomerService,
     private router: Router,
@@ -49,11 +50,28 @@ export class CustomersComponent implements OnInit {
 
       if (params.has('page')) {
         const page = Number(params.get('page'));
-        if (page > 0) {
+        const maxPage = Math.ceil(
+          this.dataSource.totalItems / this.itemsPerPage
+        );
+        if (page > 0 && page <= maxPage) {
           this.currentPage = page;
+        } else {
+          this.navigateWithMergedParams(AppRoutes.Dashboard, {
+            page: 1,
+          });
         }
       }
+
+      if (params.has('search')) {
+        const search = params.get('search');
+        if (search) {
+          this.search = search;
+        }
+      } else {
+        this.search = '';
+      }
     });
+
     this.loadCustomers();
   }
 
@@ -63,7 +81,30 @@ export class CustomersComponent implements OnInit {
         this.currentPage,
         this.itemsPerPage,
         this.sortBy,
-        this.sortOrder
+        this.sortOrder,
+        this.search,
+        this.search
+      )
+      .subscribe({
+        next: (response) => {
+          this.dataSource.data = response.data;
+          this.dataSource.totalItems = response.totalItems;
+        },
+        error: (error) => {
+          console.error('There was an error loading customers:', error);
+        },
+      });
+  }
+
+  loadCustomersWithSearch(search: string): void {
+    this.customerService
+      .getCustomers<CustomersResponse>(
+        this.currentPage,
+        this.itemsPerPage,
+        this.sortBy,
+        this.sortOrder,
+        search,
+        search
       )
       .subscribe({
         next: (response) => {
@@ -120,6 +161,12 @@ export class CustomersComponent implements OnInit {
   updateCustomer(customerId: number): void {
     this.navigateWithMergedParams(AppRoutes.Dashboard, {
       update: customerId,
+    });
+  }
+
+  deleteCustomer(customerId: number): void {
+    this.navigateWithMergedParams(AppRoutes.Dashboard, {
+      delete: customerId,
     });
   }
 

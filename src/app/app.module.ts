@@ -14,6 +14,7 @@ import { FormatDatePipe } from './utils/pipes/format-date.pipe';
 import { NavbarComponent } from './main/navbar/navbar.component';
 import { FooterComponent } from './main/footer/footer.component';
 import { SortIconComponent } from './main/sort-icon/sort-icon.component';
+import { SearchComponent } from './main/search/search.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { SortIconComponent } from './main/sort-icon/sort-icon.component';
     NavbarComponent,
     FooterComponent,
     SortIconComponent,
+    SearchComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [
