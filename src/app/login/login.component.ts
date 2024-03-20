@@ -21,7 +21,8 @@ export class LoginComponent {
         this.router.navigate([AppRoutes.Dashboard]);
       },
       error: (error) => {
-        this.errorMessage = error.error;
+        this.errorMessage =
+          error.error.message || error.error || 'An error occurred';
       },
     });
   }
