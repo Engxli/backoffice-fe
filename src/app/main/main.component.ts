@@ -20,6 +20,18 @@ export class MainComponent implements OnInit {
   onSearch(search: string) {
     this.customerComponent.loadCustomersWithSearch(search);
   }
+
+  onFilterApplied({ ageFrom, ageTo, dobFrom, dobTo }: any) {
+    console.log(
+      `ageFrom: ${ageFrom}, ageTo: ${ageTo}, dobFrom: ${dobFrom}, dobTo: ${dobTo}`
+    );
+    this.customerComponent.loadCustomersWithFilters(
+      ageFrom,
+      ageTo,
+      dobFrom,
+      dobTo
+    );
+  }
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {

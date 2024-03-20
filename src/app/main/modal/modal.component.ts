@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AppRoutes } from '../../models/AppRoutes';
 import { CustomerService } from '../../services/customer.service';
 import { formatDate } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modal',
@@ -23,6 +24,8 @@ export class ModalComponent implements OnInit {
   customerIdToUpdate: string | null = null;
   today: Date = new Date();
 
+  private queryParamsSubscription!: Subscription;
+
   @Output() customerAdded = new EventEmitter<void>();
 
   constructor(
@@ -32,25 +35,28 @@ export class ModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe((params) => {
-      this.isDeleteMode = params['delete'] ? true : false;
-      this.isUpdateMode = params['update'] ? true : false;
-      this.modalTitle = this.isUpdateMode
-        ? 'Update Customer'
-        : this.isDeleteMode
-        ? 'Delete Customer'
-        : 'Add New Customer';
-      this.submitButtonLabel = this.isUpdateMode
-        ? 'Update Customer'
-        : this.isDeleteMode
-        ? 'Delete Customer'
-        : 'Create Customer';
-      if (this.isUpdateMode || this.isDeleteMode) {
-        const id = this.isUpdateMode ? 'update' : 'delete';
-        this.customerIdToUpdate = params[id];
-        this.prepareForUpdateCustomerOrDelete(params[id]);
+    this.queryParamsSubscription = this.activatedRoute.queryParams.subscribe(
+      (params) => {
+        console.log('s');
+        this.isDeleteMode = params['delete'] ? true : false;
+        this.isUpdateMode = params['update'] ? true : false;
+        this.modalTitle = this.isUpdateMode
+          ? 'Update Customer'
+          : this.isDeleteMode
+          ? 'Delete Customer'
+          : 'Add New Customer';
+        this.submitButtonLabel = this.isUpdateMode
+          ? 'Update Customer'
+          : this.isDeleteMode
+          ? 'Delete Customer'
+          : 'Create Customer';
+        if (this.isUpdateMode || this.isDeleteMode) {
+          const id = this.isUpdateMode ? 'update' : 'delete';
+          this.customerIdToUpdate = params[id];
+          this.prepareForUpdateCustomerOrDelete(params[id]);
+        }
       }
-    });
+    );
   }
 
   prepareForUpdateCustomerOrDelete(id: string): void {
@@ -58,6 +64,12 @@ export class ModalComponent implements OnInit {
       next: (customer) => this.populateForm(customer),
       error: (error) => this.handleError(error),
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.queryParamsSubscription) {
+      this.queryParamsSubscription.unsubscribe();
+    }
   }
 
   populateForm(customer: any): void {
@@ -161,13 +173,14 @@ export class ModalComponent implements OnInit {
     if (age > 0) {
       const currentYear = new Date().getFullYear();
       const birthYear = currentYear - age;
-      this._dateOfBirth.setFullYear(birthYear);
+      this._dateOfBirth = new Date(birthYear, 0, 1);
     }
   }
 
   onDOBChange(dob: string): void {
     this._dateOfBirth = new Date(dob);
-    const age = new Date().getFullYear() - this._dateOfBirth.getFullYear();
+    const currentDate = new Date();
+    let age = this.calculateAge(this._dateOfBirth);
     this._age = age >= 0 ? age : 0;
   }
 
@@ -176,5 +189,19 @@ export class ModalComponent implements OnInit {
       queryParams: { new: 'false', update: null, delete: null },
       queryParamsHandling: 'merge',
     });
+  }
+
+  calculateAge(dob: Date): number {
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - dob.getFullYear();
+    const monthDifference = currentDate.getMonth() - dob.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && currentDate.getDate() < dob.getDate())
+    ) {
+      age--;
+    }
+    return age;
   }
 }

@@ -16,7 +16,11 @@ export class CustomerService {
     sortBy: string,
     sortOrder: string,
     name?: string,
-    number?: string
+    number?: string,
+    ageFrom?: string,
+    ageTo?: string,
+    dobFrom?: string,
+    dobTo?: string
   ) {
     const params = {
       page,
@@ -25,6 +29,10 @@ export class CustomerService {
       sortOrder,
       name: name ?? '',
       number: number ?? '',
+      ageFrom: ageFrom ?? '',
+      ageTo: ageTo ?? '',
+      dobFrom: dobFrom ?? '',
+      dobTo: dobTo ?? '',
     };
 
     return this.instance.get<T>(`/api/customers`, params);

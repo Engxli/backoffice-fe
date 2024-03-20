@@ -3,7 +3,10 @@
     <app-navbar />
   </div>
   <div class="h-auto w-full">
-    <app-search (searchEmiter)="onSearch($event)" />
+    <app-search
+      (searchEmiter)="onSearch($event)"
+      (filterEmiter)="onFilterApplied($event)"
+    />
     <app-customers #customerComponent></app-customers>
   </div>
   <div class="h-16 w-full">

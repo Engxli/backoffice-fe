@@ -16,6 +16,10 @@ export class CustomersComponent implements OnInit {
   sortOrder: string = 'ASC'; // Default sorting order
   itemsPerPageOptions: number[] = [5, 10, 20, 50];
   search: string = '';
+  ageFrom: string = '';
+  ageTo: string = '';
+  dobFrom: string = '';
+  dobTo: string = '';
   constructor(
     private customerService: CustomerService,
     private router: Router,
@@ -50,15 +54,9 @@ export class CustomersComponent implements OnInit {
 
       if (params.has('page')) {
         const page = Number(params.get('page'));
-        const maxPage = Math.ceil(
-          this.dataSource.totalItems / this.itemsPerPage
-        );
-        if (page > 0 && page <= maxPage) {
+
+        if (page > 0) {
           this.currentPage = page;
-        } else {
-          this.navigateWithMergedParams(AppRoutes.Dashboard, {
-            page: 1,
-          });
         }
       }
 
@@ -69,6 +67,42 @@ export class CustomersComponent implements OnInit {
         }
       } else {
         this.search = '';
+      }
+
+      if (params.has('ageFrom')) {
+        const ageFrom = params.get('ageFrom');
+        if (ageFrom) {
+          this.ageFrom = ageFrom;
+        }
+      } else {
+        this.ageFrom = '';
+      }
+
+      if (params.has('ageTo')) {
+        const ageTo = params.get('ageTo');
+        if (ageTo) {
+          this.ageTo = ageTo;
+        }
+      } else {
+        this.ageTo = '';
+      }
+
+      if (params.has('dobFrom')) {
+        const dobFrom = params.get('dobFrom');
+        if (dobFrom) {
+          this.dobFrom = dobFrom;
+        }
+      } else {
+        this.dobFrom = '';
+      }
+
+      if (params.has('dobTo')) {
+        const dobTo = params.get('dobTo');
+        if (dobTo) {
+          this.dobTo = dobTo;
+        }
+      } else {
+        this.dobTo = '';
       }
     });
 
@@ -83,7 +117,11 @@ export class CustomersComponent implements OnInit {
         this.sortBy,
         this.sortOrder,
         this.search,
-        this.search
+        this.search,
+        this.ageFrom,
+        this.ageTo,
+        this.dobFrom,
+        this.dobTo
       )
       .subscribe({
         next: (response) => {
@@ -104,7 +142,41 @@ export class CustomersComponent implements OnInit {
         this.sortBy,
         this.sortOrder,
         search,
-        search
+        search,
+        this.ageFrom,
+        this.ageTo,
+        this.dobFrom,
+        this.dobTo
+      )
+      .subscribe({
+        next: (response) => {
+          this.dataSource.data = response.data;
+          this.dataSource.totalItems = response.totalItems;
+        },
+        error: (error) => {
+          console.error('There was an error loading customers:', error);
+        },
+      });
+  }
+
+  loadCustomersWithFilters(
+    ageFrom: string,
+    ageTo: string,
+    dobFrom: string,
+    dobTo: string
+  ): void {
+    this.customerService
+      .getCustomers<CustomersResponse>(
+        this.currentPage,
+        this.itemsPerPage,
+        this.sortBy,
+        this.sortOrder,
+        this.search,
+        this.search,
+        ageFrom,
+        ageTo,
+        dobFrom,
+        dobTo
       )
       .subscribe({
         next: (response) => {

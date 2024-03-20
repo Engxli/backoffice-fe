@@ -12,19 +12,30 @@ export class SearchComponent {
   searchText: string = '';
   isAdvancedSearch: boolean = false;
   private defaultDate: Date = new Date('1998-09-06');
-  private _ageFrom: number =
-    new Date().getFullYear() - this.defaultDate.getFullYear();
-  private _ageTo: number =
-    new Date().getFullYear() - this.defaultDate.getFullYear();
+  private _ageFrom: number = this.calculateAge(this.defaultDate);
+  private _ageTo: number = this.calculateAge(this.defaultDate);
   private _dobFrom: Date = this.defaultDate;
   private _dobTo: Date = this.defaultDate;
-
+  applyFilters: boolean = false;
   constructor(private router: Router, private activeRoute: ActivatedRoute) {}
   @Output() searchEmiter = new EventEmitter<string>();
+  @Output() filterEmiter = new EventEmitter<any>();
 
   ngOnInit(): void {
     this.activeRoute.queryParams.subscribe((params) => {
       this.searchText = params['search'] || '';
+      this.isAdvancedSearch = params['filter'] === 'true';
+      this.applyFilters = params['applyFilters'] === 'true';
+      if (
+        params['dobFrom'] &&
+        params['dobTo'] &&
+        params['ageFrom'] &&
+        params['ageTo']
+      ) {
+        this.dobFrom = params['dobFrom'];
+        this.dobTo = params['dobTo'];
+        this.applyFilters = true;
+      }
     });
     this.searchTerms
       .pipe(
@@ -49,6 +60,59 @@ export class SearchComponent {
 
   toggleAdvancedSearch(): void {
     this.isAdvancedSearch = !this.isAdvancedSearch;
+
+    this.router.navigate([AppRoutes.Dashboard], {
+      queryParams: {
+        filter: this.isAdvancedSearch,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  filterCustomers(): void {
+    this.filterEmiter.emit({
+      ageFrom: this.ageFrom,
+      ageTo: this.ageTo,
+      dobFrom: this.dobFrom,
+      dobTo: this.dobTo,
+    });
+    this.router
+      .navigate([AppRoutes.Dashboard], {
+        queryParams: {
+          ageFrom: this.ageFrom > 0 ? this.ageFrom : null,
+          ageTo: this.ageTo > 0 ? this.ageTo : null,
+          dobFrom: this.dobFrom,
+          dobTo: this.dobTo,
+          page: 1,
+        },
+        queryParamsHandling: 'merge',
+      })
+      .then(() => {
+        this.toggleAdvancedSearch();
+      });
+  }
+
+  clearFilters(): void {
+    this.filterEmiter.emit({
+      ageFrom: '',
+      ageTo: '',
+      dobFrom: '',
+      dobTo: '',
+    });
+    this.router
+      .navigate([AppRoutes.Dashboard], {
+        queryParams: {
+          ageFrom: null,
+          ageTo: null,
+          dobFrom: null,
+          dobTo: null,
+          applyFilters: false,
+        },
+        queryParamsHandling: 'merge',
+      })
+      .then(() => {
+        this.applyFilters = false;
+      });
   }
 
   get ageFrom(): number {
@@ -89,7 +153,8 @@ export class SearchComponent {
 
   set dobFrom(value: string) {
     this._dobFrom = new Date(value);
-    const age = new Date().getFullYear() - this._dobFrom.getFullYear();
+    const currentDate = new Date();
+    let age = this.calculateAge(this._dobFrom);
     this._ageFrom = age >= 0 ? age : 0;
   }
 
@@ -99,7 +164,22 @@ export class SearchComponent {
 
   set dobTo(value: string) {
     this._dobTo = new Date(value);
-    const age = new Date().getFullYear() - this._dobTo.getFullYear();
+    const currentDate = new Date();
+    let age = this.calculateAge(this._dobTo);
     this._ageTo = age >= 0 ? age : 0;
+  }
+
+  calculateAge(dob: Date): number {
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - dob.getFullYear();
+    const monthDifference = currentDate.getMonth() - dob.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && currentDate.getDate() < dob.getDate())
+    ) {
+      age--;
+    }
+    return age;
   }
 }
